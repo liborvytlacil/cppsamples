@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
     using namespace std;
 
     try {
-        parseArguments(argc, argv);
+        parseArguments(argc, (const char**) argv);
     } catch (const CmdArgumentException &ex) {
         cerr << ex.what() << endl;
         cout << "Usage: " << argv[0] << " -c|-d [-o outputfile] inputfile" << endl;

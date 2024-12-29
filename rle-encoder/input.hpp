@@ -6,27 +6,43 @@
 
 #include <string>
 
+/**
+ * Operation mode.
+ */
 enum class Mode {
     COMPRESS,
     DECOMPRESS
 };
 
+/**
+ * Parsed input arguments.
+ */
 struct ParsedArguments {
     Mode mode;
     std::string inputFile;
     std::string outputFile;
 };
 
+/**
+ * Represents an exception thrown during argument parsing when malformed input arguments are provided.
+ */
 class CmdArgumentException : public std::runtime_error { 
 public:
     explicit CmdArgumentException(const std::string &message)
         : std::runtime_error(message) { }
 };
 
-inline ParsedArguments parseArguments(int argc, char* argv[]) {
+/**
+ * Parses the given input arguments. The semantics of the arguments 'argc' and 'argv' is the same
+ * as the arguments of the main function.
+ * 
+ * Throws CmdArgumentException when parsing encounters an invalid or malformed input.
+ */
+inline ParsedArguments parseArguments(int argc, const char* argv[]) {
     ParsedArguments parsedArgs;
     bool modeSet = false;
 
+    // Note: the first argument is the name of the executable, so we skip its parsing.
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
 
