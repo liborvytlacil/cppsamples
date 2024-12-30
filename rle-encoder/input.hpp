@@ -38,13 +38,13 @@ public:
  * 
  * Throws CmdArgumentException when parsing encounters an invalid or malformed input.
  */
-inline ParsedArguments parseArguments(int argc, const char* argv[]) {
+inline ParsedArguments parseArguments(const std::vector<std::string> &args) {
     ParsedArguments parsedArgs;
     bool modeSet = false;
 
     // Note: the first argument is the name of the executable, so we skip its parsing.
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
+    for (int i = 1; i < args.size(); ++i) {
+        std::string arg = args[i];
 
         if (arg == "-c") {
             if (modeSet) {
@@ -59,10 +59,10 @@ inline ParsedArguments parseArguments(int argc, const char* argv[]) {
             parsedArgs.mode = Mode::DECOMPRESS;
             modeSet = true;
         } else if (arg == "-o") {
-            if (i + 1 >= argc) {
+            if (i + 1 >= args.size()) {
                 throw CmdArgumentException("Missing output file name after -o.");
             }
-            parsedArgs.outputFile = argv[i + 1];
+            parsedArgs.outputFile = args[i + 1];
             ++i;
         } else if (parsedArgs.inputFile.empty()) {
             parsedArgs.inputFile = arg;
