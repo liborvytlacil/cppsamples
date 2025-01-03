@@ -126,13 +126,71 @@ static void testRleEncoding() {
     setTestGroup("Encoding only part of the input vector.");
     encodedInput = encode(input, 5);
     assertEquals((size_t) 4, encodedInput.size());
+}
 
+static void testEncodedDataToByteVector() {
+    setTestSuite("Transforming encoded data to a byte vector");
+    setTestGroup("Transforming sample input.");
+    std::vector<Repetition> encodedInput {{4, 'A'}, {6, 'D'}, {1, 'C'}};
+    std::vector<char> bytes = toByteSequence(encodedInput);
+    assertEquals((size_t) 6, bytes.size());
+    assertEquals(static_cast<char>(4), bytes[0]);
+    assertEquals('A', bytes[1]);
+    assertEquals(static_cast<char>(6), bytes[2]);
+    assertEquals('D', bytes[3]);
+    assertEquals(static_cast<char>(1), bytes[4]);
+    assertEquals('C', bytes[5]);
+}
+
+static void testRleDecoding() {
+    setTestSuite("RLE Decoding");
+    setTestGroup("Single encoded sequence");
+    std::vector<Repetition> input {{4, 'A'}};
+    std::vector<char> decodedInput = decode(input);
+    assertEquals(static_cast<size_t>(4), decodedInput.size());
+
+    setTestGroup("Multiple encoded sequence");
+    input = {{2, 'b'}, {5, 'd'}, {11, ','}};
+    decodedInput = decode(input);
+    assertEquals(static_cast<size_t>(18), decodedInput.size());
+    assertEquals('b', decodedInput[0]);
+    assertEquals('d', decodedInput[2]);
+    assertEquals(',', decodedInput[7]);
+}
+
+static void testParsingEncodedInput() {
+    setTestSuite("Parsing encoded input");
+    setTestGroup("Single encoded input sequence");
+    std::vector<char> encodedInput = {12, 'C'};
+    std::vector<Repetition> parsedInput = parseEncodedInput(encodedInput, 2);
+    assertEquals((size_t) 1, parsedInput.size());
+    assertEquals(static_cast<uint8_t>(12), parsedInput[0].count);
+    assertEquals('C', parsedInput[0].byte);
+
+
+    setTestGroup("Multiple encoded input sequence.");
+    encodedInput = {3, 'x', 4, 'P'};
+    parsedInput = parseEncodedInput(encodedInput, 4);
+    assertEquals((size_t) 2, parsedInput.size());
+    assertEquals(static_cast<uint8_t>(3), parsedInput[0].count);
+    assertEquals('x', parsedInput[0].byte);
+    assertEquals(static_cast<uint8_t>(4), parsedInput[1].count);
+    assertEquals('P', parsedInput[1].byte);
+
+    setTestGroup("Odd size of encoded input.");
+    assertThrows([]() {
+        std::vector<char> encodedInput = {3, 'x', 4, 'P'};
+        parseEncodedInput(encodedInput, 3);
+    });
 }
 
 int main() {
     try {
         testInput();
         testRleEncoding();
+        testEncodedDataToByteVector();
+        testRleDecoding();
+        testParsingEncodedInput();
         std::cout << std::endl << "TESTS SUCCESSFUL" << std::endl;
     } catch (std::runtime_error &ex) {
         std::cerr << ex.what();

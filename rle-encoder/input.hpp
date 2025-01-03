@@ -1,6 +1,7 @@
 /**
  * Handles command line argument input and parsing.
  */
+
 #ifndef INPUT_HPP
 #define INPUT_HPP
 
@@ -33,10 +34,12 @@ public:
 };
 
 /**
- * Parses the given input arguments. The semantics of the arguments 'argc' and 'argv' is the same
- * as the arguments of the main function.
+ * Parses the given input arguments as they appear on the command line input.
  * 
- * Throws CmdArgumentException when parsing encounters an invalid or malformed input.
+ * @args input arguments as they appear in 'char* argv[]' in the program's main function. Note that
+ * the first element of the array (the first cmd argument) os the name of the executable. 
+ * 
+ * @throws CmdArgumentException when parsing encounters an invalid or malformed input.
  */
 inline ParsedArguments parseArguments(const std::vector<std::string> &args) {
     ParsedArguments parsedArgs;
@@ -80,7 +83,6 @@ inline ParsedArguments parseArguments(const std::vector<std::string> &args) {
     }
 
     return parsedArgs;
-
 }
 
 #endif
