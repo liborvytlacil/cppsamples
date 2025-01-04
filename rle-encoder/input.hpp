@@ -82,6 +82,11 @@ inline ParsedArguments parseArguments(const std::vector<std::string> &args) {
         throw CmdArgumentException("Input file not specified.");
     }
 
+    // default output file name
+    if (parsedArgs.outputFile.empty()) {
+        parsedArgs.outputFile = parsedArgs.inputFile + ".out";
+    }
+
     return parsedArgs;
 }
 

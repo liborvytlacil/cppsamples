@@ -15,8 +15,8 @@
  * @param args parsed arguments
  */
 inline void perform(const ParsedArguments &args) {
-    std::ifstream ifs {args.inputFile};
-    std::ofstream ofs {args.outputFile};
+    std::ifstream ifs {args.inputFile, std::ios::binary};
+    std::ofstream ofs {args.outputFile, std::ios::binary};
     
     if (!ifs) {
         throw RLEException {"Unable to open the input file."};
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
         perform(parsedArguments);
     } catch (const CmdArgumentException &ex) {
         cerr << ex.what() << endl;
-        cout << "Usage: " << argv[0] << " -c|-d [-o outputfile] inputfile" << endl;
+        cout << "Usage: " << argv[0] << " {-c|-d} [-o outputfile] inputfile" << endl;
         return 1;
     } catch (const RLEException &ex) {
         cerr << ex.what() << endl;

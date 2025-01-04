@@ -1,6 +1,6 @@
 /**
- * Runs functions that test key parts of the program.
- */
+ * Defines tests for key parts of the program and a main() function that runs them a prints reports.
+*/
 
 #include <iostream>
 #include <string>
@@ -10,7 +10,13 @@
 #include "input.hpp"
 #include "rle.hpp"
 
+/**
+ * Name of the current test suite. For information purposes.
+ */
 std::string currentTestSuite;
+/**
+ * Name of the current test. For information purposes.
+ */
 std::string currentTestGroup;
 
 static void setTestSuite(std::string testSuite) {
@@ -23,6 +29,9 @@ static void setTestGroup(std::string testGroup) {
     std::cout << "\tTest Group: " << currentTestGroup << std::endl;
 }
 
+/**
+ * Allows to print values of Mode enumeration.
+ */
 static std::ostream& operator<<(std::ostream& os, Mode value) {
     switch (value) {
         case Mode::COMPRESS:
@@ -38,6 +47,9 @@ static std::ostream& operator<<(std::ostream& os, Mode value) {
     return os;
 }
 
+/**
+ * Very simple assertion that tests equality.
+ */
 template<typename T>
 static void assertEquals(T expected, T actual) {
     if (expected != actual) {
@@ -47,6 +59,10 @@ static void assertEquals(T expected, T actual) {
     }
 }
 
+/**
+ * A very simple assertion that calls the given function and tests whether an exception of
+ * type std::runtime_error is thrown by the given function.
+ */
 static void assertThrows(std::function<void()> func) {
     try {
         func();
@@ -57,8 +73,11 @@ static void assertThrows(std::function<void()> func) {
     throw std::runtime_error("Exception was expected to be thrown but it was not thrown.");
 }
 
+/**
+ * Tests parsing command line input.
+ */
 static void testInput() {
-    setTestSuite("Cmd input");
+    setTestSuite("Command line input");
     
     setTestGroup("Multiple modes specified.");
 
@@ -95,6 +114,9 @@ static void testInput() {
     assertEquals(parsedArgs.outputFile, std::string{"output.out"});
 }
 
+/**
+ * Tests encoding aglorithm.
+ */
 static void testRleEncoding() {
     setTestSuite("RLE Encoding");
     setTestGroup("Encoding single sequence.");
@@ -128,6 +150,9 @@ static void testRleEncoding() {
     assertEquals((size_t) 4, encodedInput.size());
 }
 
+/**
+ * Tests transforming intermediate representation of encoded data to byte vectors.
+ */
 static void testEncodedDataToByteVector() {
     setTestSuite("Transforming encoded data to a byte vector");
     setTestGroup("Transforming sample input.");
@@ -142,6 +167,9 @@ static void testEncodedDataToByteVector() {
     assertEquals('C', bytes[5]);
 }
 
+/**
+ * Tests decoding algorithm.
+ */
 static void testRleDecoding() {
     setTestSuite("RLE Decoding");
     setTestGroup("Single encoded sequence");
@@ -158,6 +186,9 @@ static void testRleDecoding() {
     assertEquals(',', decodedInput[7]);
 }
 
+/**
+ * Tests parsing encoded input into intermediate form.
+ */
 static void testParsingEncodedInput() {
     setTestSuite("Parsing encoded input");
     setTestGroup("Single encoded input sequence");
@@ -193,7 +224,9 @@ int main() {
         testParsingEncodedInput();
         std::cout << std::endl << "TESTS SUCCESSFUL" << std::endl;
     } catch (std::runtime_error &ex) {
+        std::cout << std::endl << "TESTS WERE NOT SUCCESSFUL" << std::endl;
         std::cerr << ex.what();
+        return 1;
     }
     return 0;
 }

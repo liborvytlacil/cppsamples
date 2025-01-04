@@ -149,28 +149,32 @@ const int bufferSize = 512;
  * Reads the raw bytes from the input stream, encodes them using RLE and writes the encoded result
  * into the given output stream. Input is encoded in chunks of 512 bytes.
  * 
- * @param ifs input stream containing decoded data
- * @param ofs output stream to write encoded data
+ * @param ifs input stream containing decoded data, expected to be in OK state
+ * @param ofs output stream to write encoded data, expected to be in OK state
  */
 inline void performEncoding(std::ifstream &ifs, std::ofstream &ofs) {
     std::vector<char> buffer(bufferSize);
-    while (ifs.read(buffer.data(), bufferSize)) {
+
+    while (!ifs.eof()) {
+        ifs.read(buffer.data(), bufferSize);
         std::streamsize bytesRead = ifs.gcount();
 
-        std::vector<Repetition> encodedInput = encode(buffer, bytesRead);
-        std::vector<char> encodedInputAsBytes = toByteSequence(encodedInput);
-
-        if (ofs) {
-            ofs.write(encodedInputAsBytes.data(), encodedInputAsBytes.size());
+        if (!ifs.eof() && (ifs.fail() || ifs.bad())) {
+            throw RLEException {"Input stream is in a failed state."};
         }
 
-        if (!ofs) {
-            throw RLEException {"Output stream is in a failed state."};
-        }
-    }
+        if (bytesRead > 0) {
+            std::vector<Repetition> encodedInput = encode(buffer, bytesRead);
+            std::vector<char> encodedInputAsBytes = toByteSequence(encodedInput);
 
-    if (!ifs.eof()) {
-        throw RLEException {"Input stream is in a failed state."};
+            if (ofs) {
+                ofs.write(encodedInputAsBytes.data(), encodedInputAsBytes.size());
+            }
+
+            if (!ofs) {
+                throw RLEException {"Output stream is in a failed state."};
+            }
+        }
     }
 }
 
@@ -178,29 +182,32 @@ inline void performEncoding(std::ifstream &ifs, std::ofstream &ofs) {
  * Reads the raw bytes from the input stream, decodes them using RLE and writes the decoded result
  * into the given output stream. Input is decoded in chunks of 512 bytes.
  * 
- * @param ifs input stream containing encoded data
- * @param ofs output stream to write decoded data
+ * @param ifs input stream containing encoded data, expected to be in OK state
+ * @param ofs output stream to write decoded data, expected to be in OK state
  */
 inline void performDecoding(std::ifstream &ifs, std::ofstream &ofs) {
     std::vector<char> buffer(bufferSize);
 
-    while (ifs.read(buffer.data(), bufferSize)) {
+    while (!ifs.eof()) {
+        ifs.read(buffer.data(), bufferSize);
         std::streamsize bytesRead = ifs.gcount();
 
-        std::vector<Repetition> encodedInput = parseEncodedInput(buffer, bytesRead);
-        std::vector<char> decodedInputAsBytes = decode(encodedInput);
-
-        if (ofs) {
-            ofs.write(decodedInputAsBytes.data(), decodedInputAsBytes.size());
+        if (!ifs.eof() && (ifs.fail() || ifs.bad())) {
+            throw RLEException {"Input stream is in a failed state."};
         }
 
-        if (!ofs) {
-            throw RLEException {"Output stream is in a failed state."};
-        }
-    }
+        if (bytesRead > 0) {
+            std::vector<Repetition> encodedInput = parseEncodedInput(buffer, bytesRead);
+            std::vector<char> decodedInputAsBytes = decode(encodedInput);
 
-    if (!ifs.eof()) {
-        throw RLEException {"Input stream is in a failed state."};
+            if (ofs) {
+                ofs.write(decodedInputAsBytes.data(), decodedInputAsBytes.size());
+            }
+
+            if (!ofs) {
+                throw RLEException {"Output stream is in a failed state."};
+            }
+        }
     }
 }
 
